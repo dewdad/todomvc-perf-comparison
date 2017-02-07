@@ -93,24 +93,14 @@
     }
   });
 
-  var timer1 = 0;
-
   linker.watch('todos', function () {
-    if (timer1) clearTimeout(timer1)
-    timer1 = setTimeout(function () {
-      todoStorage.save(linker.model.todos);
-    }, 0);
+    todoStorage.save(linker.model.todos);
   });
 
-  var timer = 0;
-
   linker.watch('filterTodos', function () {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(function () {
-      var vm = linker.model;
-      todoStorage.save(vm.todos);
-      vm.remaining = vm.todos.filter(filters.active).length;
-    }, 0);
+    var vm = linker.model;
+    todoStorage.save(vm.todos);
+    vm.remaining = vm.todos.filter(filters.active).length;
   });
 
   linker.watch('allDone', function () {
