@@ -64,6 +64,7 @@
 
       doneEdit: function (todo, ev) {
         if (ev.keyCode === 13) {
+          //enter 
           if (!this.editedTodo) {
             return
           }
