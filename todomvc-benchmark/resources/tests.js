@@ -2,6 +2,40 @@ var numberOfItemsToAdd = 50;
 var Suites = [];
 
 Suites.push({
+    name: 'link',
+    url: 'todomvc/link/index.html',
+    version: '0.4.0',
+    prepare: function (runner, contentWindow, contentDocument) {
+        return runner.waitForElement('#new-todo').then(function (element) {
+            element.focus();
+            return element;
+        });
+    },
+    tests: [
+        new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
+            var app = contentWindow.app;
+            for (var i = 0; i < numberOfItemsToAdd; i++) {
+                var keyupEvent = document.createEvent('Event');
+                keyupEvent.initEvent('keyup', true, true);
+                keyupEvent.keyCode = 13;
+                app.newTodo = 'Vue ----------- Something to do ' + i;
+                newTodo.dispatchEvent(keyupEvent)
+            }
+        }),
+        new BenchmarkTestStep('CompletingAllItems', function (newTodo, contentWindow, contentDocument) {
+            var checkboxes = contentDocument.querySelectorAll('.toggle');
+            for (var i = 0; i < checkboxes.length; i++)
+                checkboxes[i].click();
+        }),
+        new BenchmarkTestStep('DeletingAllItems', function (newTodo, contentWindow, contentDocument) {
+            var deleteButtons = contentDocument.querySelectorAll('.destroy');
+            for (var i = deleteButtons.length - 1; i > -1; i--)
+                deleteButtons[i].click();
+        })
+    ]
+});
+
+Suites.push({
     name: 'Mithril',
     url: 'todomvc/mithril/index.html',
     version: '0.1.19',
