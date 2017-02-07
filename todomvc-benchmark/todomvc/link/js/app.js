@@ -93,9 +93,13 @@
     }
   });
 
+  var timer1 = 0;
+
   linker.watch('todos', function () {
-    var vm = linker.model;
-    todoStorage.save(vm.todos);
+    if (timer1) clearTimeout(timer1)
+    timer1 = setTimeout(function () {
+      todoStorage.save(linker.model.todos);
+    }, 0);
   });
 
   var timer = 0;
