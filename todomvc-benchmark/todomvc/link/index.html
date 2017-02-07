@@ -1,9 +1,9 @@
 <!doctype html>
-<html data-framework="vue">
+<html data-framework="link">
 
 <head>
   <meta charset="utf-8">
-  <title>Vue.js • TodoMVC</title>
+  <title>Link.js • TodoMVC</title>
   <link rel="stylesheet" href="bower_components/todomvc-common/base.css">
   <style>
     .x-hide {
@@ -25,7 +25,7 @@
           <div class="view">
             <input class="toggle" type="checkbox" x-model="todo.completed">
             <label @dblclick='editTodo(todo)'>{{todo.title}}</label>
-            <button class="destroy" @click='removeTodo(todo)'></button>
+            <button class="destroy" @click='removeTodo($index)'></button>
           </div>
           <input class="edit" type="text" x-model="todo.title" @blur="doneEdit(todo)" @keyup="doneEdit(todo)">
         </li>

@@ -20,13 +20,13 @@
     return n <= 1 ? 'item' : 'items'
   });
 
-  var linker = linker = link({
+  var linker = link({
 
     // the root element that will be compiled
     el: document.querySelector('#todoapp'),
 
     model: {
-      todos: [],
+      todos: todoStorage.fetch(),
       newTodo: '',
       editedTodo: null,
       filterTodos: [],
@@ -42,12 +42,19 @@
         if (!value) {
           return
         }
-        this.todos.push({ title: value, completed: false });
+        var todo = { title: value, completed: false };
+        this.todos.push(todo);
+        if (this.filter !== 'completed') {
+          this.filterTodos.push(todo)
+        }
         this.newTodo = '';
       },
 
-      removeTodo: function (todo) {
-        this.todos.splice(this.todos.indexOf(todo), 1);
+      removeTodo: function (index) {
+        this.todos.splice(index, 1);
+        if (this.filter !== 'completed') {
+          this.filterTodos.splice(index, 1);
+        }
       },
 
       editTodo: function (todo) {
@@ -80,13 +87,14 @@
 
       removeCompleted: function () {
         this.todos = this.todos.filter(filters.active)
+        this.filterTodos = this.filterTodos.filter(filters.active);
       }
     }
   });
 
   linker.watch('todos', function () {
     var vm = linker.model;
-    vm.filterTodos = vm.todos.filter(filters[vm.filter])
+    todoStorage.save(vm.todos);
   });
 
   var timer = 0;
@@ -108,10 +116,15 @@
   });
 
   linker.watch('filter', function () {
+    filterFn();
+  });
+
+  function filterFn() {
     var vm = linker.model;
     vm.filterTodos = vm.todos.filter(filters[vm.filter])
-  });
-  linker.model.todos = todoStorage.fetch();
+  }
+
+  filterFn();
 
   var app = linker.model;
   app.filters = filters;
