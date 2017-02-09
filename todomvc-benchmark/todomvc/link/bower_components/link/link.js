@@ -1,1 +1,1232 @@
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):e.link=t()}(this,function(){"use strict";function e(e){return!!e&&"object"==typeof e}function t(e){return"function"==typeof e}function n(e){return["string","number","boolean","null","undefined"].indexOf(typeof e)>-1}function i(e){return"string"==typeof e}function r(e){return"boolean"==typeof e}function o(e){return i(e)&&"{"===e[0]&&"}"===e.slice(-1)}function l(e,t){e.className.indexOf(t)===-1&&(e.className=c(e.className)+" "+t)}function s(e,t){e.className.indexOf(t)>-1&&(e.className=e.className.replace(new RegExp(t,"g"),""))}function a(){if(arguments.length<2)return arguments[0];var e=arguments[0],t=Array.prototype.slice.call(arguments,1);return e.replace(/\{(\d+)\}/g,function(e,n){return t[n]})}function c(e){return"string"==typeof e?e.trim():e}function u(e,t){for(var n=e.length,i=-1;++i<n;)t(e[i],i,e)}function h(e,t){return u(Object.keys(t),function(n){e[n]=t[n]}),e}function f(e,t,n,i){e.addEventListener&&(e.addEventListener(t,n,!1),i.push({el:e,event:t,handler:n}))}function p(e,t,n){e.removeEventListener&&e.removeEventListener(t,n,!1)}function d(e,t,n){var i=e[t];if(i)n(i);else{var r=new XMLHttpRequest;r.onreadystatechange=function(){r.readyState===XMLHttpRequest.DONE&&200===r.status&&(e[t]=c(r.responseText),n(r.responseText))},r.open("GET",t,!0),r.setRequestHeader("Accept","text/html"),r.send(null)}}function m(t){if(e(t)){var n,i={};return u(Object.keys(t),function(r){n=t[r],oe(n)?(i[r]=[],u(n,function(e){i[r].push(m(e))})):e(n)?i[r]=m(n):i[r]=n}),i}return t}function v(e){var t=0;return function(){t&&clearTimeout(t),t=setTimeout(e,0)}}function _(e){if("undefined"==typeof e){var t=location.href,n=t.indexOf("#");return n===-1?"":t.slice(n+1)}location.hash=e}function x(e){var t=location.href,n=t.indexOf("#");n>-1?location.replace(t.slice(0,n)+"#"+e):location.replace(t+"#"+e)}function k(t,n,i){function r(){var r=n[_()];if(!r)return void x(i);r.model&&e(r.model)||(r.model={});var o=c(r.template);o?y(t,r,o):r.templateUrl?d(t._routeTplStore,r.templateUrl,function(e){y(t,r,e)}):y(t,r,"")}f(window,"hashchange",r,t._eventStore),r()}function y(e,n,i){function r(){e._routeEl&&(n.lastLinker=re({el:e._routeEl,model:n.model,methods:n.methods}),t(n.postLink)&&n.postLink.call(n,n.lastLinker))}var o;if(e._routeEl&&(e._routeEl.innerHTML=i),n.lastLinker&&n.lastLinker.unlink(),t(n.preLink)&&(o=n.preLink.call(n,e)),o&&t(o.then))o.then(r);else{if(o===!1)return;r()}}function b(){var e=a.apply(null,arguments);return new Error(e)}function w(e){if(!Number(e))return e;e+="";var t=[],n="",i=-1,r=[],o=",";(i=e.indexOf("."))>-1?(t=e.slice(0,i).split(""),n=e.slice(i)):t=e.split("");do r.unshift(t.splice(-3).join(""));while(t.length>0);return r.join(o)+n}function g(e){return i(e)&&11===e.length?e.slice(0,3)+"****"+e.slice(-4):e}function C(e,t){return new Function("$this","with($this){return "+e+";}")(t)}function O(e,t,n){var i,r=e.expr,o=e.linker.model;return i=n?t?n.replace(ve,function(e,t){return A(t,o)}):C(r,o):t?A(r,o):C(r,o)}function A(e,t){var n=e.split("|");if(1===n.length)return C(e,t);var i=ke[c(n[1])];return i(C(c(n[0]),t))}function N(e){return C(e.expr,e.linker.model)}function T(e,t,r){null===t?t="null":"undefined"==typeof t&&(t="undefined");var o="";if(i(t))o=[e,"=","'",t,"'"].join("");else{if(!n(t))throw b("value should be a primitive type for setWatchValue");o=[e,"=",t].join("")}C(o,r)}function j(e){var t=e.tag;if(!t)throw b("tag is required for a component!");t=t.toUpperCase(),de.registeredTags[t]||(de.registeredTags[t]=e,++de.registeredTagsCount)}function E(e,t){var n=t.config,i=c(n.template),r=t.el;i?M(e,r,n,i):n.templateUrl&&d(e._comTplStore,n.templateUrl,function(t){M(e,r,n,t)})}function L(e,t,n,i){return function(){T(e,C(t,i),n)}}function M(e,n,i,r){var o=m(i.model),l=i.methods||{};if(oe(i.props)){var s;u(i.props,function(i){if(s=c(n.getAttribute(i)),t(e.model[s]))l[i]=e.model[s];else{e.watch(s,L(i,s,o,e.model),!0);var r=C(s,e.model);r!==o[i]&&(o[i]=r)}})}if(n.innerHTML=r,n.children.length>1)throw b("component can only have one root element");var a=re({el:n.children[0],model:o,methods:l});t(i.postLink)&&i.postLink.call(a.model,n,a,i)}function S(e,t){function n(){T(e.prop,i.value||"",e.linker.model)}var i=e.el;f(i,t,n,e.linker._eventStore)}function $(e){function t(){var t,i=n.value,o=n.checked,l=N(e);if(!r(l)&&!oe(l))throw b("checkbox should bind with array or a boolean value");oe(l)?(t=l.indexOf(i),!o&&t>-1?l.splice(t,1):l.push(i)):T(e.prop,o,e.linker.model)}var n=e.el;f(n,"click",t,e.linker._eventStore)}function U(e){var t=e.el,n=t.nodeName,i=t.type;switch(n){case"INPUT":switch(i){case"text":case"email":case"password":case"url":S(e,"keyup");break;case"radio":S(e,"click");break;case"checkbox":$(e)}break;case"SELECT":S(e,"change");break;default:S(e,"keyup")}}function B(e,t,n){e.el.textContent=O(e,t,n)}function z(e){var t=N(e);e.className?t?l(e.el,e.className):s(e.el,e.className):t&&l(e.el,t)}function H(e){N(e)?e.el.setAttribute("disabled","disabled"):e.el.removeAttribute("disabled")}function Z(e){var t=e.el,n=N(e);if("radio"===t.type)t.checked=t.value===n;else if("checkbox"===t.type)if(oe(n))t.checked=n.indexOf(t.value)>-1;else{if(!r(n))throw b("checkbox should bind with array or a boolean value");t.checked=n}else t.value!=n&&(t.value=n)}function q(e){N(e)?e.el.setAttribute("readonly","readonly"):e.el.removeAttribute("readonly")}function D(e,t,n,i){var r,o=e.el.cloneNode(!0),l=e.linker.model,s=Object.create(null);return s.$index={value:n,enumerable:!0,configurable:!0,writable:!0},s[i]={value:t,enumerable:!0,configurable:!0,writable:!0},r=new Ce(o,Object.create(l,s)),r._context=e,e.linker._children.push(r),{el:o,linker:r}}function F(e,t){function n(){var t=document.createDocumentFragment();u(s,function(e){e.unlink()}),s.length=0,u(r,function(n,r){i=D(e,n,r,a),s.push(i.linker),t.appendChild(i.el)}),l.parentNode.insertBefore(t,l)}var i,r=C(e.prop,e.linker.model),o=e.el,l=e.comment,s=e.lastLinks,a=e.expr.split(_e)[0];if(s||(s=e.lastLinks=[],l=e.comment=document.createComment("repeat end for "+e.prop),o.parentNode.insertBefore(e.comment,o),o.parentNode.removeChild(o)),t){var c,h,f,p=t.op;switch(p){case"mutate":break;case"push":h=r.length-1,c=r[h],i=D(e,c,h,a),s.push(i.linker),l.parentNode.insertBefore(i.el,l);break;case"pop":f=s.pop(),f.unlink();break;case"splice":f=Array.prototype.splice.apply(s,t.args),u(f,function(e){e.unlink()}),u(s,function(e,t){e.model.$index=t});break;case"unshift":var d=s[0].el;c=r[0],i=D(e,c,0,a),s.unshift(i.linker),d.parentNode.insertBefore(i.el,d);break;case"shift":f=s.shift(),f.unlink();break;default:n()}}else n()}function R(e){var t=e.el,n=e.directive,i=!!N(e);"x-show"===n&&i||"x-hide"===n&&!i?s(t,"x-hide"):l(t,"x-hide")}function P(e){e.linker._watchMap[e.prop].push(X(e))}function W(e,t,n){e.linker._watchMap[e.prop].push(G(e,t,n))}function X(e){return function(t){ge[e.directive](e,t)}}function G(e,t,n){return function(){ge[e.directive](e,t,n)}}function I(e,t,n){var i=e._watchMap[t];i||(i=e._watchMap[t]=[]),i.push(n)}function V(e,t){return function(n){var i=t.el,r=t.fn,o=t.args;if(null===r)C(o,e.model);else if(e.model[r])if(oe(o)){var l=[n,i],s=[];u(o,function(t){t=c(t),"'"===t.charAt(0)||'"'===t.charAt(0)?s.push(t.replace(ue,"")):s.push(C(t,e.model))}),pe.apply(l,s),e.model[r].apply(e.model,l)}else e.model[r].apply(e.model,[n,i])}}function J(e,t,n){var i=['"',n,'"'].join("").replace(/(\{\{)/g,'"+(').replace(/(\}\})/g,')+"'),r=new we(i);r.run(),r.watches&&u(r.watches,function(o){var l=ye.create(t,o,"x-bind",i,e);e._linkContextCollection.push(l),W(l,r.filters,n)})}function K(e,t,n,i,r){var o=ye.create(t,n,i,r,e);Q(e,o)}function Q(e,t){e._linkContextCollection.push(t),P(t),"x-model"===t.directive&&U(t)}function Y(e,t,n,i){var r,o,l;se.test(i)?r=be.create(t,n,i):ae.test(i)?(o=i.indexOf("("),r=be.create(t,n,i.slice(0,o))):ce.test(i)?(l=i.match(ce)[1].split(","),o=i.indexOf("("),r=be.create(t,n,i.slice(0,o),l)):r=be.create(t,n,null,i),f(t,n,V(e,r),e._eventStore)}function ee(e,t,n,i){var r,o,l,s,a,c=i.slice(1,-1).split(",");u(c,function(i){l=i.split(":"),r=l[0].replace(ue,"").trim(),o=l[1].trim(),le.test(o)?(a=ye.create(t,o,n,o,e),a.className=r,Q(e,a)):(s=new we(o),s.run(),s.watches&&u(s.watches,function(i){a=ye.create(t,i,n,o,e),a.className=r,Q(e,a)}))})}function te(e,t,n,i){var r;if(le.test(i))K(e,t,i,n,i);else if(o(i))ee(e,t,n,i);else{var l=new we(i);l.run(),l.watches&&u(l.watches,function(o){r=ye.create(t,o,n,i,e),e._linkContextCollection.push(r),W(r,l.filters)})}}function ne(e,t){var n,i,r,o,l,s,a=t.nodeType;if(1===a){if(o=t.hasAttributes()){if(t.hasAttribute("x-repeat")){if(i=c(t.getAttribute("x-repeat")),r=i.split(_e),3!==r.length)throw b("repeat only support expr like: var in array.");return K(e,t,r[2],"x-repeat",i),t.removeAttribute("x-repeat"),void(e._children=[])}if(t.hasAttribute("x-view")){if(e._routeEl)throw b("a link context can only have on more than one x-view");return t.removeAttribute("x-view"),void(e._routeEl=t)}u(t.attributes,function(n){l=n.name,s=c(n.value),"x"===l[0]&&"-"===l[1]?te(e,t,l,s):l[0]===xe&&Y(e,t,l.slice(1),s)})}if(de.registeredTagsCount>0&&(n=t.tagName.toUpperCase(),de.registeredTags[n]))return void e._comCollection.push({el:t,config:de.registeredTags[n]});u(t.childNodes,function(t){ne(e,t)})}else 3===a?(i=c(t.textContent),i&&me.test(i)&&J(e,t,i)):9===a&&u(t.childNodes,function(t){ne(e,t)})}function ie(e,t,n){u(["push","pop","unshift","shift","reverse","sort","splice"],function(i){e[i]=function(){var r=Array.prototype[i].apply(e,arguments);return n._notify(t,{op:i,args:arguments}),n._notify(t+".length"),r}})}function re(e){return e=h({el:window.document,model:{},methods:null,routes:null},e),new Ce(e.el,e.model,e.methods,e.routes)}var oe=Array.isArray,le=/^\$?\w+(\.?\w+)*$/,se=/^[a-zA-Z$_]\w*$/,ae=/^[a-zA-Z$_]\w*\(\s*\)$/,ce=/^[a-zA-Z$_]\w*\(([^\)]+)\)$/,ue=/[\'\"]/g,he=/[a-zA-Z$_]/,fe=/[a-zA-Z0-9$\.]/,pe=Array.prototype.unshift,de={registeredTagsCount:0,registeredTags:Object.create(null)},me=/\{\{[^\}]+\}\}/,ve=/\{\{([^\}]+)\}\}/g,_e=/\s+/,xe="@",ke={uppercase:function(e){return i(e)?e.toUpperCase():e},lowercase:function(e){return i(e)?e.toLowerCase():e},money:w,phone:g},ye=function(e,t,n,i,r){this.el=e,this.prop=t,this.directive=n,this.expr=i,this.linker=r};ye.create=function(e,t,n,i,r){return r._watchMap[t]||(r._watchMap[t]=[]),new ye(e,t,n,i,r)};var be=function(e,t,n,i){this.el=e,this.event=t,this.fn=n,this.args=i};be.create=function(e,t,n,i){return new be(e,t,n,i)};var we=function(e){this.text=e,this.index=0,this.len=e.length,this.watches=null,this.filters=null};we.prototype.run=function(){for(var e=this;this.index<this.len;){var t=e.text[e.index];if(he.test(t))e.watches||(e.watches=[]),e._getWatch(t);else if('"'===t||"'"===t){for(;this._peek()!==t&&this.index<this.len;)e.index++;if(!(e.index+1<e.len))throw new Error("unclosed string in expr");e.index+=2}else if("|"===t)if("|"!==e._peek()){if(e.filters||(e.filters=[]),e.index++,e.watches.length<e.filters.length)throw new Error("bad expr");e._getFilter()}else e.index+=2;else e.index++}},we.prototype._getFilter=function(){for(var e=this,t=[this.text[this.index]];this.index<this.len;){if(!fe.test(e._peek())){e.index++;break}t.push(e.text[++e.index])}this.filters.push(c(t.join("")))},we.prototype._getWatch=function(e){for(var t=this,n=[e];this.index<this.len;){if(!fe.test(t._peek())){t.index++;break}n.push(t.text[++t.index])}this.watches.push(n.join(""))},we.prototype._peek=function(e){return e=e||1,this.index+e<this.len&&this.text[this.index+1]};var ge={"x-show":R,"x-hide":R,"x-bind":B,"x-disabled":H,"x-repeat":F,"x-class":z,"x-model":Z,"x-readonly":q},Ce=function(e,t,n,i){this.el=e,this.model=t,this._behaviors=n,this._eventStore=[],this._linkContextCollection=[],this._watchMap=Object.create(null),this._routeEl=null,this._comCollection=[],this._unlinked=!1,this._children=null,this._context=null,this._bootstrap(),i&&(this._routeTplStore=Object.create(null),k(this,i.routes,i.defaultPath)),de.registeredTagsCount>0&&this._comCollection.length>0&&(this._comTplStore=Object.create(null),this._renderComponent())};Ce.prototype._bootstrap=function(){var e=this;this._compileDOM(),this._walk(this.model,[]),u(Object.keys(this._watchMap),function(t){e._notify(t)}),this._addBehaviors()},Ce.prototype._walk=function(t,n){var i,r,o,l=this;u(Object.keys(t),function(s){i=t[s],r=oe(i),e(i)&&!r?(n.push(s),l._walk(i,n),n.pop()):(o=n.concat(s).join("."),l._defineObserver(t,s,i,o,r))})},Ce.prototype._defineObserver=function(e,t,n,i,r){var o=this;r&&ie(n,i,o),Object.defineProperty(e,t,{get:function(){return n},set:function(e){if(e!==n){if(n=e,o._unlinked)return;r&&(ie(n,i,o),o._notify(i+".length")),o._notify(i),o._context&&o._context.linker._notify(o._context.prop,{op:"mutate"}),o._children&&u(o._children,function(e){e._unlinked||e._notify(i)})}}})},Ce.prototype._addBehaviors=function(){var n=this;if(e(this._behaviors)){var i=Object.keys(this._behaviors);u(i,function(e){if(t(n._behaviors[e])){if(e in n.model&&!t(n.model[e]))throw b('{0} is defined in the data model,please change the function/method name of "{0}"',e);n.model[e]||(n.model[e]=n._behaviors[e])}})}},Ce.prototype._renderComponent=function(){var e=this;u(this._comCollection,function(t){E(e,t)})},Ce.prototype.watch=function Ae(Ae,e,n){i(Ae)&&""!==Ae.trim()&&t(e)&&I(this,Ae,n?e:v(e))},Ce.prototype._notify=function(e,t){var n=this._watchMap[e];n&&u(n,function(e){e(t)})},Ce.prototype._compileDOM=function(){ne(this,this.el)},Ce.prototype.unlink=function(){var e=this;if(this._behaviors=null,this._linkContextCollection.length=0,this._watchMap=null,this._routeEl=null,this._comCollection.length=0,this._routeTplStore=null,this._comTplStore=null,u(this._eventStore,function(e){p(e.el,e.event,e.handler)}),this._eventStore.length=0,this._children&&(u(this._children,function(e){e._unlinked||e.unlink()}),this._children.length=0),this._context){for(var t=this._context.linker._children,n=t.length;n--;)if(t[n]===e){t.splice(n,1);break}this._context=null,this.el.parentNode.removeChild(this.el),this.el=null}this.model=null,this._unlinked=!0},re.helper={addClass:l,removeClass:s,formatString:a,trim:c,each:u,hash:_},re.filter=function(e,n){!ke[e]&&t(n)&&(ke[e]=n)},re.com=j;var Oe=document.createElement("style");return Oe.type="text/css",Oe.textContent=".x-hide{display:none !important;}",document.head.insertAdjacentElement("afterBegin",Oe),re});
+/*!
+ * link.js v0.4.0
+ * (c) 2016.10-2017 leonwgc
+ * Released under the MIT License.
+ */
+(function (global, factory) {
+   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+   typeof define === 'function' && define.amd ? define(factory) :
+   (global.link = factory());
+}(this, (function () { 'use strict';
+
+function isObject(obj) {
+  return !!obj && typeof obj === 'object';
+}
+
+function isFunction(func) {
+  return (typeof func === 'function');
+}
+
+var isArray = Array.isArray;
+
+
+
+function isString(str) {
+  return typeof str === 'string';
+}
+
+function isBoolean(v) {
+  return typeof v === 'boolean';
+}
+
+function isLikeJson(str) {
+  return isString(str) && str[0] === '{' && str.slice(-1) === '}';
+}
+
+function addClass(el, className) {
+  if (el.className.indexOf(className) === -1) {
+    el.className = trim(el.className) + ' ' + className;
+  }
+}
+
+function removeClass(el, className) {
+  if (el.className.indexOf(className) > -1) {
+    el.className = el.className.replace(new RegExp(className, 'g'), '');
+  }
+}
+
+function formatString() {
+  if (arguments.length < 2) { return arguments[0]; }
+  var str = arguments[0],
+    args = Array.prototype.slice.call(arguments, 1);
+
+  return str.replace(/\{(\d+)\}/g, function (match, n) {
+    return args[n];
+  });
+}
+
+function trim(str) {
+  if (typeof str === 'string') {
+    return str.trim();
+  }
+  return str;
+}
+
+function each(arr, fn) {
+  var len = arr.length, i = -1;
+  while (++i < len) {
+    fn(arr[i], i, arr);
+  }
+}
+
+function extend(target, src) {
+  each(Object.keys(src), function (prop) {
+    target[prop] = src[prop];
+  });
+  return target;
+}
+
+function addEventListenerHandler(el, event, func, store) {
+  if (el.addEventListener) {
+    el.addEventListener(event, func, false);
+    store.push({
+      el: el,
+      event: event,
+      handler: func
+    });
+  }
+}
+
+function removeEventListenerHandler(el, event, func) {
+  if (el.removeEventListener) {
+    el.removeEventListener(event, func, false);
+  }
+}
+
+function loadTemplate(templateStore, url, cb) {
+  var tpl = templateStore[url];
+  if (tpl) {
+    cb(tpl);
+  }
+  else {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          templateStore[url] = trim(xhr.responseText);
+          cb(xhr.responseText);
+        }
+      }
+    };
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('Accept', 'text/html');
+    xhr.send(null);
+  }
+}
+
+function copy(src) {
+  if (isObject(src)) {
+    var dst = {}, val;
+    each(Object.keys(src), function (prop) {
+      val = src[prop];
+      if (isArray(val)) {
+        dst[prop] = [];
+        each(val, function (item) {
+          dst[prop].push(copy(item));
+        });
+      } else if (isObject(val)) {
+        dst[prop] = copy(val);
+      } else {
+        dst[prop] = val;
+      }
+    });
+    return dst;
+  } else {
+    return src;
+  }
+}
+
+function debounce(fn) {
+  var timer = 0;
+  return function debounceFn() {
+    if (timer) { clearTimeout(timer); }
+    timer = setTimeout(fn, 0);
+  }
+}
+
+
+
+function bind(fn, ctx) {
+  return function () {
+    return fn.apply(ctx, arguments);
+  }
+}
+
+function hash(path) {
+  if (typeof path === 'undefined') {
+    var href = location.href,
+      index = href.indexOf('#');
+    return index === -1 ? '' : href.slice(index + 1);
+  }
+  else {
+    location.hash = path;
+  }
+}
+
+function replaceHash(path) {
+  var href = location.href,
+    index = href.indexOf('#');
+  if (index > -1) {
+    location.replace(href.slice(0, index) + '#' + path);
+  }
+  else {
+    location.replace(href + '#' + path);
+  }
+}
+
+function configRoutes(linker, routes, defaultPath) {
+  addEventListenerHandler(window, 'hashchange', renderRouter, linker._eventStore);
+  renderRouter();
+  function renderRouter() {
+    var route = routes[hash()];
+    if (!route) {
+      replaceHash(defaultPath);
+      return;
+    }
+    if (!route.model || !isObject(route.model)) {
+      route.model = {};
+    }
+    var template = trim(route.template);
+    if (!template) {
+      if (route.templateUrl) {
+        loadTemplate(linker._routeTplStore, route.templateUrl, function (tpl) {
+          linkRoute(linker, route, tpl);
+        });
+      } else {
+        linkRoute(linker, route, '');
+      }
+    } else {
+      linkRoute(linker, route, template);
+    }
+  }
+}
+function linkRoute(linker, route, tpl) {
+  var preLinkReturn;
+  if (linker._routeEl) {
+    linker._routeEl.innerHTML = tpl;
+  }
+  if (route.lastLinker) {
+    route.lastLinker.unlink(); // destroy link
+  }
+  if (isFunction(route.preLink)) {
+    preLinkReturn = route.preLink.call(route, linker);
+  }
+  if (preLinkReturn && isFunction(preLinkReturn.then)) {
+    preLinkReturn.then(traceLink);
+  } else {
+    if (preLinkReturn === false) { return; }// skip link
+    traceLink();
+  }
+
+  function traceLink() {
+    if (!linker._routeEl) { return; } // no x-view , no route link 
+    route.lastLinker = link({
+      el: linker._routeEl,
+      model: route.model,
+      methods: route.methods
+    });
+    if (isFunction(route.postLink)) {
+      route.postLink.call(route, route.lastLinker);
+    }
+  }
+}
+
+var watchRegex = /^\$?\w+(\.?\w+)*$/;
+
+var fnCallRegex = /^[a-zA-Z$_]\w*\(\s*\)$/;
+var fnCallParamsRegex = /^[a-zA-Z$_]\w*\(([^\)]+)\)$/;
+var quoteRegx = /[\'\"]/g;
+var watchStartRegex = /[a-zA-Z$_]/;
+var validWatchChar = /[a-zA-Z0-9$\.]/;
+
+
+
+var glob = {
+  registeredTagsCount: 0,
+  registeredTags: Object.create(null)
+};
+var testInterpolationRegex = /\{\{[^\}]+\}\}/;
+var interpilationExprRegex = /\{\{([^\}]+)\}\}/g;
+var spaceRegex = /\s+/;
+var eventPrefix = '@';
+var interceptArrayMethods = ['push', 'pop', 'unshift', 'shift', 'reverse', 'sort', 'splice'];
+
+function linkError() {
+  var error = formatString.apply(null, arguments);
+  return new Error(error);
+}
+
+function moneyFilter(str) {
+  if (!Number(str)) { return str; }
+  str = str + '';
+  var digit = [],
+    decimals = '',
+    pointIndex = -1,
+    groups = [],
+    sep = ',';
+  if ((pointIndex = str.indexOf('.')) > -1) {
+    digit = str.slice(0, pointIndex).split('');
+    decimals = str.slice(pointIndex);
+  }
+  else {
+    digit = str.split('');
+  }
+  do {
+    groups.unshift(digit.splice(-3).join(''));
+  } while (digit.length > 0);
+
+  return groups.join(sep) + decimals;
+}
+
+function phoneFilter(str) {
+  // the middle 4 digit replace with *
+  if (isString(str) && str.length === 11) {
+    return str.slice(0, 3) + '****' + str.slice(-4);
+  }
+
+  return str;
+}
+
+var filters = {
+  uppercase: function (str) {
+    if (isString(str)) {
+      return str.toUpperCase();
+    }
+    return str;
+  },
+  lowercase: function (str) {
+    if (isString(str)) {
+      return str.toLowerCase();
+    }
+    return str;
+  },
+  money: moneyFilter,
+  phone: phoneFilter
+};
+
+function $eval(expr, $this) {
+  return (new Function('$this', 'with($this){return ' + expr + ';}'))($this);
+}
+
+function evalBindExpr(linkContext, filter, interpilationText) {
+  var val,
+    linkExpr = linkContext.expr,
+    model = linkContext.linker.model;
+  if (!interpilationText) {
+    if (!filter) {
+      val = $eval(linkExpr, model);
+    } else {
+      val = execFilterExpr(linkExpr, model);
+    }
+  } else {
+    if (!filter) {
+      val = $eval(linkExpr, model);
+    } else {
+      val = interpilationText.replace(interpilationExprRegex, function (m, e) {
+        return execFilterExpr(e, model);
+      });
+    }
+  }
+  return val;
+}
+
+function execFilterExpr(expr, model) {
+  var ar = expr.split('|');
+  if (ar.length === 1) {
+    return $eval(expr, model);
+  }
+  var filterFn = filters[trim(ar[1])];
+  return filterFn($eval(trim(ar[0]), model));
+}
+
+function setWatchValue(watch, value, model, linker) {
+  if (linker) {
+    var setter = linker._watchSetterCache[watch];
+    if (!setter) {
+      setter = linker._watchSetterCache[watch] = new Function('m', 'v', ("with(m){" + watch + "=v;}"));
+    }
+    setter(model, value);
+  } else {
+    (new Function('m', 'v', ("with(m){" + watch + "=v;}")))(model, value);
+  }
+}
+
+function registerComponent(config) {
+  var tag = config.tag;
+  if (!tag) {
+    throw linkError('tag is required for a component!');
+  }
+  tag = tag.toUpperCase();
+  if (!glob.registeredTags[tag]) {
+    glob.registeredTags[tag] = config;
+    ++glob.registeredTagsCount;
+  }
+}
+
+function renderComponent(linker, com) {
+  var config = com.config,
+    template = trim(config.template),
+    el = com.el;
+  if (!template) {
+    if (config.templateUrl) {
+      loadTemplate(linker._comTplStore, config.templateUrl, function (tpl) {
+        linkCom(linker, el, config, tpl);
+      });
+    }
+  } else {
+    linkCom(linker, el, config, template);
+  }
+}
+
+function parentNotifyFnBuilder(prop, pprop, comModel, parentModel) {
+  return function () {
+    setWatchValue(prop, $eval(pprop, parentModel), comModel);
+  };
+}
+
+function linkCom(linker, el, config, tpl) {
+  var comModel = copy(config.model);
+  var comMethods = config.methods || {};
+
+  if (isArray(config.props)) {
+    var av;
+    each(config.props, function (prop) {
+      av = trim(el.getAttribute(prop));
+      if (isFunction(linker.model[av])) {
+        comMethods[prop] = linker.model[av];
+      }
+      else {
+        linker.watch(av, parentNotifyFnBuilder(prop, av, comModel, linker.model), true);
+        var pValue = $eval(av, linker.model);
+        if (pValue !== comModel[prop]) {
+          comModel[prop] = pValue;
+        }
+      }
+    });
+  }
+
+  el.innerHTML = tpl;
+  if (el.children.length > 1) { throw linkError('component can only have one root element'); }
+  var comLinker = link({ el: el.children[0], model: comModel, methods: comMethods });
+
+  if (isFunction(config.postLink)) {
+    config.postLink.call(comLinker.model, el, comLinker, config);
+  }
+}
+
+function bindHandler(linkContext, filter, interpilationText) {
+  linkContext.el.textContent = evalBindExpr(linkContext, filter, interpilationText);
+}
+
+function classHandler(linkContext) {
+  var exprVal = linkContext.exprVal;
+
+  if (linkContext.className) {
+    // json 
+    if (exprVal) {
+      addClass(linkContext.el, linkContext.className);
+    }
+    else {
+      removeClass(linkContext.el, linkContext.className);
+    }
+  } else {
+    if (exprVal) {
+      addClass(linkContext.el, exprVal);
+    }
+  }
+}
+
+function disabledHandler(linkContext) {
+  if (linkContext.exprVal) {
+    linkContext.el.setAttribute("disabled", "disabled");
+  }
+  else {
+    linkContext.el.removeAttribute("disabled");
+  }
+}
+
+function modelHandler(linkContext) {
+  var el = linkContext.el,
+    exprVal = linkContext.exprVal;
+  if (el.type === 'radio') {
+    el.checked = (el.value === exprVal);
+  }
+  else if (el.type === 'checkbox') {
+    if (isArray(exprVal)) {
+      el.checked = exprVal.indexOf(el.value) > -1;
+    } else if (isBoolean(exprVal)) {
+      el.checked = exprVal;
+    } else {
+      throw linkError('checkbox should bind with array or a boolean value');
+    }
+  }
+  else {
+    el.value != exprVal && (el.value = exprVal);
+  }
+}
+
+function readonlyHandler(linkContext) {
+  if (linkContext.exprVal) {
+    linkContext.el.setAttribute("readonly", "readonly");
+  }
+  else {
+    linkContext.el.removeAttribute("readonly");
+  }
+}
+
+function makeRepeatLinker(linkContext, itemData, itemIndex, refVar) {
+  var cloneEl = linkContext.el.cloneNode(true),
+    model = linkContext.linker.model,
+    linker,
+    props = Object.create(null);
+  props.$index = { value: itemIndex, enumerable: true, configurable: true, writable: true };
+  props[refVar] = { value: itemData, enumerable: true, configurable: true, writable: true };
+  linker = new Link(cloneEl, Object.create(model, props));
+  linker._context = linkContext;
+  linkContext.linker._children.push(linker);
+  return { el: cloneEl, linker: linker };
+}
+
+function repeatHandler(linkContext, arrayOpInfo) {
+  var arr = linkContext.exprVal,
+    el = linkContext.el,
+    comment = linkContext.comment,
+    repeaterItem,
+    lastLinks = linkContext.lastLinks,
+    refVar = linkContext.expr.split(spaceRegex)[0];
+
+  if (!lastLinks) {
+    lastLinks = linkContext.lastLinks = [];
+    comment = linkContext.comment = document.createComment('repeat end for ' + linkContext.prop);
+    el.parentNode.insertBefore(linkContext.comment, el);
+    el.parentNode.removeChild(el);
+  }
+
+  function rebuild() {
+    var docFragment = document.createDocumentFragment();
+    linkContext.linker._children.length = 0;
+    each(lastLinks, function (link) {
+      link.unlink();
+    });
+
+    lastLinks.length = 0;
+    each(arr, function (itemData, index) {
+      repeaterItem = makeRepeatLinker(linkContext, itemData, index, refVar);
+      lastLinks.push(repeaterItem.linker);
+      docFragment.appendChild(repeaterItem.el);
+    });
+
+    comment.parentNode.insertBefore(docFragment, comment);
+  }
+
+  if (arrayOpInfo) {
+    var fn = arrayOpInfo.op,
+      itemData,
+      index,
+      _linker;
+    switch (fn) {
+      case 'mutate': break;
+      case 'push': {
+        index = arr.length - 1;
+        itemData = arr[index];
+        repeaterItem = makeRepeatLinker(linkContext, itemData, index, refVar);
+        lastLinks.push(repeaterItem.linker);
+        comment.parentNode.insertBefore(repeaterItem.el, comment);
+        break;
+      }
+      case 'pop': {
+        _linker = lastLinks.pop();
+        _linker.unlink();
+        break;
+      }
+      case 'splice': {
+        _linker = Array.prototype.splice.apply(lastLinks, arrayOpInfo.args);
+        each(_linker, function (_lk) {
+          _lk.unlink();
+        });
+        // refresh $index 
+        each(lastLinks, function (linker, index) {
+          linker.model.$index = index;
+        });
+        break;
+      }
+      case 'unshift': {
+        var firstLinkerEl = lastLinks[0].el;
+        itemData = arr[0];
+        repeaterItem = makeRepeatLinker(linkContext, itemData, 0, refVar);
+        lastLinks.unshift(repeaterItem.linker);
+        firstLinkerEl.parentNode.insertBefore(repeaterItem.el, firstLinkerEl);
+        break;
+      }
+      case 'shift': {
+        _linker = lastLinks.shift();
+        _linker.unlink();
+        break;
+      }
+      default: rebuild();
+    }
+  } else {
+    rebuild();
+  }
+}
+
+function showHideHandler(linkContext) {
+  var el = linkContext.el,
+    directive = linkContext.directive,
+    boolValue = !!linkContext.exprVal;
+  if (directive === 'x-show' && boolValue || directive === 'x-hide' && !boolValue) {
+    removeClass(el, 'x-hide');
+  }
+  else {
+    addClass(el, 'x-hide');
+  }
+}
+
+var drm = {
+  'x-show': showHideHandler,
+  'x-hide': showHideHandler,
+  'x-bind': bindHandler,
+  'x-disabled': disabledHandler,
+  'x-repeat': repeatHandler,
+  'x-class': classHandler,
+  'x-model': modelHandler,
+  'x-readonly': readonlyHandler
+};
+
+var LinkContext = function LinkContext(el, watch, directive, expr, linker) {
+  this.el = el;
+  this.prop = watch;
+  this.directive = directive;
+  this.expr = expr;
+  this.linker = linker;
+  this.filters = null;
+  this.text = null;
+  this._evalExprFn = new Function('m', ("with(m){return " + (directive !== 'x-repeat' ? expr : watch) + ";}"));
+};
+
+var prototypeAccessors = { watch: {},exprVal: {} };
+LinkContext.create = function create (el, watch, directive, expr, linker) {
+  var context, watchMap = linker._watchMap;
+  if (!watchMap[watch]) {
+    watchMap[watch] = [];
+  }
+  context = new LinkContext(el, watch, directive, expr, linker);
+  watchMap[watch].push(context);
+  return context;
+};
+
+prototypeAccessors.watch.set = function (v) {
+  var model = this.linker.model,
+    watch = this.prop;
+  if (this.prop.indexOf('.') === -1) {
+    model[watch] = v;
+  } else {
+    if (!this._setWatchFn) {
+      this._setWatchFn = new Function('m', 'v', ("with(m){" + watch + "=v;}"));
+    }
+    this._setWatchFn(model, v);
+  }
+};
+
+prototypeAccessors.exprVal.get = function () {
+  return this._evalExprFn(this.linker.model);
+};
+
+LinkContext.prototype.update = function update (arrayOpInfo) {
+  if (this.directive !== 'x-bind') {
+    drm[this.directive](this, arrayOpInfo);
+  } else {
+    drm[this.directive](this, this.filters, this.text);
+  }
+};
+
+Object.defineProperties( LinkContext.prototype, prototypeAccessors );
+var EventLinkContext = function EventLinkContext(el, event, expr) {
+  this.el = el;
+  this.event = event;
+  var right;
+  if ((right = expr.indexOf(')')) > -1) {
+    if (fnCallParamsRegex.test(expr)) {
+      expr = expr.slice(0, right) + ',$event' + expr.slice(right);
+    } else if (fnCallRegex.test(expr)) {
+      expr = expr.slice(0, right) + '$event' + expr.slice(right);
+    }
+  }
+  this.expr = expr;
+};
+EventLinkContext.create = function create (el, event, expr) {
+  return new EventLinkContext(el, event, expr);
+};
+
+var Lexer = function Lexer(text) {
+  this.text = text;
+  this.index = 0;
+  this.len = text.length;
+  this.watches = null;
+  this.filters = null;
+};
+
+Lexer.prototype.run = function run () {
+    var this$1 = this;
+
+  while (this.index < this.len) {
+    var ch = this$1.text[this$1.index];
+    if (watchStartRegex.test(ch)) {
+      if (!this$1.watches) {
+        this$1.watches = [];
+      }
+      this$1._getWatch(ch);
+    }
+    else if (ch === '"' || ch === "'") {
+      while (this._peek() !== ch && this.index < this.len) {
+        this$1.index++;
+      }
+      if (this$1.index + 1 < this$1.len) {
+        this$1.index += 2;
+      } else {
+        throw new Error('unclosed string in expr');
+      }
+    }
+    else if (ch === '|') {
+      if (this$1._peek() !== '|') {
+        if (!this$1.filters) {
+          this$1.filters = [];
+        }
+        this$1.index++;
+        if (this$1.watches.length < this$1.filters.length) { throw new Error('bad expr'); }
+        this$1._getFilter();
+      }
+      else {
+        // || 
+        this$1.index += 2;
+      }
+    }
+    else {
+      this$1.index++;
+    }
+  }
+};
+
+Lexer.prototype._getFilter = function _getFilter () {
+    var this$1 = this;
+
+  var filter = [this.text[this.index]];
+  while (this.index < this.len) {
+    if (validWatchChar.test(this$1._peek())) {
+      filter.push(this$1.text[++this$1.index]);
+    }
+    else {
+      this$1.index++;
+      break;
+    }
+  }
+  this.filters.push(trim(filter.join('')));
+};
+
+Lexer.prototype._getWatch = function _getWatch (ch) {
+    var this$1 = this;
+
+  var watch = [ch];
+  while (this.index < this.len) {
+    if (validWatchChar.test(this$1._peek())) {
+      watch.push(this$1.text[++this$1.index]);
+    } else {
+      this$1.index++;
+      break;
+    }
+  }
+  this.watches.push(watch.join(''));
+};
+
+Lexer.prototype._peek = function _peek (i) {
+  i = i || 1;
+  return (this.index + i < this.len) ? this.text[this.index + 1] : false;
+};
+
+function commonReact(linkContext, event) {
+  var el = linkContext.el;
+  function commonHandler() {
+    linkContext.watch = el.value || '';
+  }
+  addEventListenerHandler(el, event, commonHandler, linkContext.linker._eventStore);
+}
+
+function checkboxReact(linkContext) {
+  var el = linkContext.el;
+  function checkboxHandler() {
+    var value = el.value,
+      checked = el.checked,
+      propValue = linkContext.exprVal,
+      valIndex;
+
+    if (!(isBoolean(propValue) || isArray(propValue))) {
+      throw linkError('checkbox should bind with array or a boolean value');
+    }
+
+    if (isArray(propValue)) {
+      valIndex = propValue.indexOf(value);
+      if (!checked && valIndex > -1) {
+        propValue.splice(valIndex, 1);
+      }
+      else {
+        propValue.push(value);
+      }
+    }
+    else {
+      linkContext.watch = checked;
+    }
+  }
+  addEventListenerHandler(el, 'click', checkboxHandler, linkContext.linker._eventStore);
+}
+
+function modelReactDispatch(linkContext) {
+  var el = linkContext.el,
+    nodeName = el.nodeName,
+    type = el.type;
+  switch (nodeName) {
+    case 'INPUT': {
+      switch (type) {
+        case 'text':
+        case 'email':
+        case 'password':
+        case 'url': {
+          commonReact(linkContext, 'keyup');
+          break;
+        }
+        case 'radio': {
+          commonReact(linkContext, 'click');
+          break;
+        }
+        case 'checkbox': {
+          checkboxReact(linkContext);
+          break;
+        }
+      }
+      break;
+    }
+    case 'SELECT': {
+      commonReact(linkContext, 'change');
+      break;
+    }
+    default: {
+      commonReact(linkContext, 'keyup');
+      break;
+    }
+  }
+}
+
+function getLinkContextsFromInterpolation(linker, el, text) {
+  var expr = ['"', text, '"'].join('').replace(/(\{\{)/g, '"+(').replace(/(\}\})/g, ')+"');
+  var lexer = new Lexer(expr);
+  lexer.run();
+  if (lexer.watches) {
+    each(lexer.watches, function (watch) {
+      var linkContext = LinkContext.create(el, watch, 'x-bind', expr, linker);
+      linkContext.text = text;
+      linkContext.filters = lexer.filters;
+    });
+  }
+}
+
+function createLinkContextAndWatch(linker, el, watch, directive, expr) {
+  var linkContext = LinkContext.create(el, watch, directive, expr, linker);
+  if (directive === 'x-model') {
+    modelReactDispatch(linkContext);
+  }
+}
+
+function getEventLinkContext(linker, el, event, expr) {
+  var eventLinkContext = EventLinkContext.create(el, event, expr);
+  addEventListenerHandler(el, event, bind(new Function('$event', ("with(this){" + (eventLinkContext.expr) + "}")), linker.model), linker._eventStore);
+}
+
+function getClassLinkContext(linker, el, directive, expr) {
+  var
+    kvPairs = expr.slice(1, -1).split(','),
+    className,
+    subExpr,
+    spliter,
+    lexer,
+    linkContext;
+
+  each(kvPairs, function (kv) {
+    spliter = kv.split(':');
+    className = spliter[0].replace(quoteRegx, '').trim();
+    subExpr = spliter[1].trim();
+
+    if (watchRegex.test(subExpr)) {
+      linkContext = LinkContext.create(el, subExpr, directive, subExpr, linker);
+      linkContext.className = className;
+    }
+    else {
+      lexer = new Lexer(subExpr);
+      lexer.run();
+      if (lexer.watches) {
+        each(lexer.watches, function (w) {
+          linkContext = LinkContext.create(el, w, directive, subExpr, linker);
+          linkContext.className = className;
+        });
+      }
+    }
+  });
+}
+
+function getLinkContext(linker, el, directive, expr) {
+  var linkContext;
+  if (watchRegex.test(expr)) {
+    createLinkContextAndWatch(linker, el, expr, directive, expr);
+  }
+  else if (isLikeJson(expr)) {
+    getClassLinkContext(linker, el, directive, expr);
+  }
+  else {
+    var lexer = new Lexer(expr);
+    lexer.run();
+    if (lexer.watches) {
+      each(lexer.watches, function (watch) {
+        linkContext = LinkContext.create(el, watch, directive, expr, linker);
+        linkContext.filters = lexer.filters;
+      });
+    }
+  }
+}
+
+function compile(linker, el) {
+  var tag,
+    expr,
+    w,
+    hasAttributes,
+    attrName,
+    attrValue,
+    nodeType = el.nodeType;
+
+  if (nodeType === 1) {
+    hasAttributes = el.hasAttributes();
+
+    if (hasAttributes) {
+      if (el.hasAttribute('x-repeat')) {
+        expr = trim(el.getAttribute('x-repeat')); // var in watch
+        w = expr.split(spaceRegex);
+        if (w.length !== 3) { throw linkError('repeat only support expr like: var in array.'); }
+        createLinkContextAndWatch(linker, el, w[2], 'x-repeat', expr);
+        el.removeAttribute('x-repeat');
+        linker._children = [];
+        return;
+      }
+
+      if (el.hasAttribute('x-view')) {
+        if (linker._routeEl) { throw linkError('a link context can only have on more than one x-view'); }
+        el.removeAttribute('x-view');
+        linker._routeEl = el;
+        return;
+      }
+
+      each(el.attributes, function (attr) {
+        attrName = attr.name;
+        attrValue = attr.value.trim();
+        if (attrName[0] === 'x' && attrName[1] === '-') {
+          getLinkContext(linker, el, attrName, attrValue);
+        } else if (attrName[0] === eventPrefix) {
+          getEventLinkContext(linker, el, attrName.slice(1), attrValue);
+        }
+      });
+    }
+
+    if (glob.registeredTagsCount > 0) {
+      tag = el.tagName.toUpperCase();
+      if (glob.registeredTags[tag]) {
+        linker._comCollection.push({
+          el: el,
+          config: glob.registeredTags[tag]
+        });
+        return;
+      }
+    }
+
+    each(el.childNodes, function (node) {
+      compile(linker, node);
+    });
+
+  } else if (nodeType === 3) {
+    expr = trim(el.textContent);
+    if (expr && testInterpolationRegex.test(expr)) {
+      getLinkContextsFromInterpolation(linker, el, expr);
+    }
+  } else if (nodeType === 9) {
+    each(el.childNodes, function (node) {
+      compile(linker, node);
+    });
+  }
+}
+
+function interceptArray(arr, watch, linker) {
+   each(interceptArrayMethods, function (fn) {
+      arr[fn] = function () {
+        var result = Array.prototype[fn].apply(arr, arguments);
+        linker._notify(watch, { op: fn, args: arguments });
+        linker._notify(watch + '.length');
+        return result;
+      };
+    });
+}
+
+var WatchRunner = function WatchRunner(linker) {
+  this.linker = linker;
+  this.queue = [];
+  this.waiting = false;
+};
+WatchRunner.prototype.push = function push (watch) {
+  var $this = this;
+  if (this.queue.indexOf(watch) === -1) {
+    this.queue.push(watch);
+    if (!this.waiting) {
+      this.waiting = true;
+      setTimeout(function () {
+        $this.flush();
+      }, 0);
+    }
+  }
+};
+WatchRunner.prototype.flush = function flush () {
+  var linker = this.linker;
+  each(this.queue, function (watch) {
+    linker._notify(watch);
+  });
+  this.reset();
+};
+WatchRunner.prototype.reset = function reset () {
+  this.waiting = false;
+  this.queue.length = 0;
+};
+
+var push$1 = Array.prototype.push;
+
+var Link = function Link(el, data, behaviors, routeConfig) {
+  this.el = el;
+  this.model = data;
+  this._behaviors = behaviors;
+  this._eventStore = [];
+  this._watchFnMap = Object.create(null);
+  this._watchMap = Object.create(null);
+  this._routeEl = null;
+  this._comCollection = [];
+  this._unlinked = false;
+  this._children = null; // store repeat linker 
+  this._context = null; // linkContext for repeat child linker
+  this._watchSetterCache = Object.create(null);
+  this._runner = new WatchRunner(this);
+  this._bootstrap();
+
+  if (routeConfig) {
+    this._routeTplStore = Object.create(null);
+    configRoutes(this, routeConfig.routes, routeConfig.defaultPath);
+  }
+  if (glob.registeredTagsCount > 0 && this._comCollection.length > 0) {
+    this._comTplStore = Object.create(null);
+    this._renderComponent();
+  }
+};
+
+Link.prototype._bootstrap = function _bootstrap () {
+  var $this = this;
+  this._compileDOM();
+  this._walk(this.model, []);
+  each(Object.keys(this._watchMap), function (watch) {
+    $this._notify(watch);
+  });
+  this._addBehaviors();
+};
+
+Link.prototype._walk = function _walk (model, propStack) {
+  var value,
+    valIsArray,
+    watch,
+    $this = this;
+  each(Object.keys(model), function (prop) {
+    value = model[prop];
+    valIsArray = isArray(value);
+    if (isObject(value) && !valIsArray) {
+      propStack.push(prop);
+      $this._walk(value, propStack);
+      propStack.pop();
+    }
+    else {
+      watch = propStack.concat(prop).join('.');
+      $this._defineObserver(model, prop, value, watch, valIsArray);
+    }
+  });
+};
+
+Link.prototype._defineObserver = function _defineObserver (model, prop, value, watch, valIsArray) {
+  var $this = this, runner = this._runner;
+  if (valIsArray) {
+    interceptArray(value, watch, $this);
+  }
+  Object.defineProperty(model, prop, {
+    get: function () {
+      return value;
+    },
+    set: function (newVal) {
+      if (newVal !== value) {
+        if (!valIsArray) {
+          value = newVal;
+          $this._notify(watch);
+        } else {
+          value.length = 0;
+          if (newVal.length) {
+            push$1.apply(value, newVal);
+          }
+          $this._notify(watch + '.length');
+          $this._notify(watch);
+        }
+        if ($this._context) {
+          // nextTick(() => $this._context.linker._notify($this._context.prop, { op: 'mutate' }));
+          $this._context.linker._notify($this._context.prop, { op: 'mutate' });
+        }
+        if ($this._children) {
+          // nextTick(() => {
+          // each($this._children, function (linker) {
+          //   if (!linker._unlinked) {
+          //     linker._runner.push(watch);
+          //   }
+          // });
+          // });
+          each($this._children, function (linker) {
+              if (!linker._unlinked) {
+                linker._runner.push(watch);
+              }
+            });
+        }
+      }
+    }
+  });
+};
+
+Link.prototype._addBehaviors = function _addBehaviors () {
+  var linker = this;
+  if (isObject(this._behaviors)) {
+    var methods = Object.keys(this._behaviors);
+    each(methods, function (fn) {
+      if (isFunction(linker._behaviors[fn])) {
+        if ((fn in linker.model) && !isFunction(linker.model[fn])) {
+          throw linkError('{0} is defined in the data model,please change the function/method name of "{0}"', fn);
+        }
+        if (!linker.model[fn]) {
+          linker.model[fn] = linker._behaviors[fn];
+        }
+      }
+    });
+  }
+};
+Link.prototype._renderComponent = function _renderComponent () {
+  var linker = this;
+  each(this._comCollection, function (com) {
+    renderComponent(linker, com);
+  });
+};
+
+Link.prototype.watch = function watch (watch, handler, immediate) {
+  if (isString(watch) && watch.trim() !== '' && isFunction(handler)) {
+    var userMap = this._watchFnMap[watch];
+    if (!userMap) {
+      userMap = this._watchFnMap[watch] = [];
+    }
+    userMap.push(!immediate ? debounce(handler) : handler);
+  }
+};
+
+Link.prototype._notify = function _notify (watch, arrayOpInfo) {
+  if (!this._unlinked) {
+    var linkContexts = this._watchMap[watch];
+    if (linkContexts) {
+      each(linkContexts, function (lc) {
+        lc.update(arrayOpInfo);
+      });
+    }
+    var fns = this._watchFnMap[watch];
+    if (fns) {
+      each(fns, function (fn) {
+        fn();
+      });
+    }
+  }
+};
+
+Link.prototype._compileDOM = function _compileDOM () {
+  compile(this, this.el);
+};
+
+Link.prototype.unlink = function unlink () {
+    var this$1 = this;
+
+  this._behaviors = null;
+  this._watchMap = null;
+  this._watchFnMap = null;
+  this._routeEl = null;
+  this._comCollection.length = 0;
+  this._routeTplStore = null;
+  this._comTplStore = null;
+  this._watchSetterCache = null;
+
+  each(this._eventStore, function (event) {
+    removeEventListenerHandler(event.el, event.event, event.handler);
+  });
+  this._eventStore.length = 0;
+
+  if (this._children) {
+    each(this._children, function (linker) {
+      if (!linker._unlinked) {
+        linker.unlink();
+      }
+    });
+    this._children.length = 0;
+  }
+
+  if (this._context) {
+    var children = this._context.linker._children,
+      len = children.length, i = -1;
+    while (++i < len) {
+      if (children[i] === this$1) {
+        children.splice(i, 1);
+        break;
+      }
+    }
+    this._context = null;
+    this.el.parentNode.removeChild(this.el);
+    this.el = null;
+  }
+
+  this.model = null;
+  this._unlinked = true;
+};
+
+function link(config) {
+  config = extend({ el: window.document, model: {}, methods: null, routes: null }, config);
+  return new Link(config.el, config.model, config.methods, config.routes);
+}
+
+link.helper = {
+  addClass: addClass,
+  removeClass: removeClass,
+  formatString: formatString,
+  trim: trim,
+  each: each,
+  hash: hash
+};
+
+link.filter = function (name, fn) {
+  if (!filters[name] && isFunction(fn)) {
+    filters[name] = fn;
+  }
+};
+
+link.com = registerComponent;
+
+var style = document.createElement('style');
+style.type = 'text/css';
+style.textContent = '.x-hide{display:none !important;}';
+document.head.insertAdjacentElement('afterBegin', style);
+
+return link;
+
+})));
