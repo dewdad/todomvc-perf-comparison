@@ -50,9 +50,9 @@
         this.newTodo = '';
       },
 
-      removeTodo: function (index) {
-        this.todos.splice(index, 1);
-        if (this.filter !== 'completed') {
+      removeTodo: function (todo, index) {
+        this.todos.splice(this.todos.indexOf(todo), 1);
+        if (index > -1) {
           this.filterTodos.splice(index, 1);
         }
       },
@@ -87,14 +87,16 @@
       },
 
       removeCompleted: function () {
+        var vm=this;
         this.todos = this.todos.filter(filters.active)
-        this.filterTodos = this.filterTodos.filter(filters.active);
+        vm.filterTodos = vm.todos.filter(filters[vm.filter])
       }
     }
   });
 
   linker.watch('todos', function () {
-    todoStorage.save(linker.model.todos);
+    var vm = linker.model;
+    todoStorage.save(vm.todos);
   });
 
   linker.watch('filterTodos', function () {
