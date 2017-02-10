@@ -17,10 +17,6 @@ function isFunction(func) {
   return (typeof func === 'function');
 }
 
-var isArray = Array.isArray;
-
-
-
 function isString(str) {
   return typeof str === 'string';
 }
@@ -119,7 +115,7 @@ function copy(src) {
     var dst = {}, val;
     each(Object.keys(src), function (prop) {
       val = src[prop];
-      if (isArray(val)) {
+      if (Array.isArray(val)) {
         dst[prop] = [];
         each(val, function (item) {
           dst[prop].push(copy(item));
@@ -233,8 +229,8 @@ function linkRoute(linker, route, tpl) {
 
 var watchRegex = /^\$?\w+(\.?\w+)*$/;
 
-var fnCallRegex = /^[a-zA-Z$_]\w*\(\s*\)$/;
-var fnCallParamsRegex = /^[a-zA-Z$_]\w*\(([^\)]+)\)$/;
+
+
 var quoteRegx = /[\'\"]/g;
 var watchStartRegex = /[a-zA-Z$_]/;
 var validWatchChar = /[a-zA-Z0-9$\.]/;
@@ -250,60 +246,14 @@ var interpilationExprRegex = /\{\{([^\}]+)\}\}/g;
 var spaceRegex = /\s+/;
 var eventPrefix = '@';
 var interceptArrayMethods = ['push', 'pop', 'unshift', 'shift', 'reverse', 'sort', 'splice'];
+var filters=Object.create(null);
 
 function linkError() {
   var error = formatString.apply(null, arguments);
   return new Error(error);
 }
 
-function moneyFilter(str) {
-  if (!Number(str)) { return str; }
-  str = str + '';
-  var digit = [],
-    decimals = '',
-    pointIndex = -1,
-    groups = [],
-    sep = ',';
-  if ((pointIndex = str.indexOf('.')) > -1) {
-    digit = str.slice(0, pointIndex).split('');
-    decimals = str.slice(pointIndex);
-  }
-  else {
-    digit = str.split('');
-  }
-  do {
-    groups.unshift(digit.splice(-3).join(''));
-  } while (digit.length > 0);
-
-  return groups.join(sep) + decimals;
-}
-
-function phoneFilter(str) {
-  // the middle 4 digit replace with *
-  if (isString(str) && str.length === 11) {
-    return str.slice(0, 3) + '****' + str.slice(-4);
-  }
-
-  return str;
-}
-
-var filters = {
-  uppercase: function (str) {
-    if (isString(str)) {
-      return str.toUpperCase();
-    }
-    return str;
-  },
-  lowercase: function (str) {
-    if (isString(str)) {
-      return str.toLowerCase();
-    }
-    return str;
-  },
-  money: moneyFilter,
-  phone: phoneFilter
-};
-
+// import {filters from '../filters/index';
 function $eval(expr, $this) {
   return (new Function('$this', 'with($this){return ' + expr + ';}'))($this);
 }
@@ -388,7 +338,7 @@ function linkCom(linker, el, config, tpl) {
   var comModel = copy(config.model);
   var comMethods = config.methods || {};
 
-  if (isArray(config.props)) {
+  if (Array.isArray(config.props)) {
     var av;
     each(config.props, function (prop) {
       av = trim(el.getAttribute(prop));
@@ -452,7 +402,7 @@ function modelHandler(linkContext) {
     el.checked = (el.value === exprVal);
   }
   else if (el.type === 'checkbox') {
-    if (isArray(exprVal)) {
+    if (Array.isArray(exprVal)) {
       el.checked = exprVal.indexOf(el.value) > -1;
     } else if (isBoolean(exprVal)) {
       el.checked = exprVal;
@@ -644,14 +594,14 @@ Object.defineProperties( LinkContext.prototype, prototypeAccessors );
 var EventLinkContext = function EventLinkContext(el, event, expr) {
   this.el = el;
   this.event = event;
-  var right;
-  if ((right = expr.indexOf(')')) > -1) {
-    if (fnCallParamsRegex.test(expr)) {
-      expr = expr.slice(0, right) + ',$event' + expr.slice(right);
-    } else if (fnCallRegex.test(expr)) {
-      expr = expr.slice(0, right) + '$event' + expr.slice(right);
-    }
-  }
+  // var right;
+  // if ((right = expr.indexOf(')')) > -1) {
+  // if (fnCallParamsRegex.test(expr)) {
+  //   expr = expr.slice(0, right) + ',$event' + expr.slice(right);
+  // } else if (fnCallRegex.test(expr)) {
+  //   expr = expr.slice(0, right) + '$event' + expr.slice(right);
+  // }
+  // }
   this.expr = expr;
 };
 EventLinkContext.create = function create (el, event, expr) {
@@ -759,11 +709,11 @@ function checkboxReact(linkContext) {
       propValue = linkContext.exprVal,
       valIndex;
 
-    if (!(isBoolean(propValue) || isArray(propValue))) {
+    if (!(isBoolean(propValue) || Array.isArray(propValue))) {
       throw linkError('checkbox should bind with array or a boolean value');
     }
 
-    if (isArray(propValue)) {
+    if (Array.isArray(propValue)) {
       valIndex = propValue.indexOf(value);
       if (!checked && valIndex > -1) {
         propValue.splice(valIndex, 1);
@@ -783,35 +733,30 @@ function modelReactDispatch(linkContext) {
   var el = linkContext.el,
     nodeName = el.nodeName,
     type = el.type;
-  switch (nodeName) {
-    case 'INPUT': {
-      switch (type) {
-        case 'text':
-        case 'email':
-        case 'password':
-        case 'url': {
-          commonReact(linkContext, 'keyup');
-          break;
-        }
-        case 'radio': {
-          commonReact(linkContext, 'click');
-          break;
-        }
-        case 'checkbox': {
-          checkboxReact(linkContext);
-          break;
-        }
+  if (nodeName === 'INPUT') {
+    switch (type) {
+      case 'text':
+      case 'password': {
+        commonReact(linkContext, 'keyup');
+        break;
       }
-      break;
+      case 'radio': {
+        commonReact(linkContext, 'click');
+        break;
+      }
+      case 'checkbox': {
+        checkboxReact(linkContext);
+        break;
+      }
+      default: {
+        commonReact(linkContext, 'keyup');
+        break;
+      }
     }
-    case 'SELECT': {
-      commonReact(linkContext, 'change');
-      break;
-    }
-    default: {
-      commonReact(linkContext, 'keyup');
-      break;
-    }
+  } else if (nodeName === 'SELECT') {
+    commonReact(linkContext, 'change');
+  } else {
+    commonReact(linkContext, 'keyup');
   }
 }
 
@@ -1044,7 +989,7 @@ Link.prototype._walk = function _walk (model, propStack) {
     $this = this;
   each(Object.keys(model), function (prop) {
     value = model[prop];
-    valIsArray = isArray(value);
+    valIsArray = Array.isArray(value);
     if (isObject(value) && !valIsArray) {
       propStack.push(prop);
       $this._walk(value, propStack);
@@ -1080,22 +1025,18 @@ Link.prototype._defineObserver = function _defineObserver (model, prop, value, w
           $this._notify(watch);
         }
         if ($this._context) {
-          // nextTick(() => $this._context.linker._notify($this._context.prop, { op: 'mutate' }));
+          // nextTick(() => )); //hurt perf
           $this._context.linker._notify($this._context.prop, { op: 'mutate' });
         }
         if ($this._children) {
           // nextTick(() => {
-          // each($this._children, function (linker) {
-          //   if (!linker._unlinked) {
-          //     linker._runner.push(watch);
-          //   }
-          // });
+
           // });
           each($this._children, function (linker) {
-              if (!linker._unlinked) {
-                linker._runner.push(watch);
-              }
-            });
+            if (!linker._unlinked) {
+              linker._notify(watch);
+            }
+          });
         }
       }
     }
@@ -1199,6 +1140,8 @@ Link.prototype.unlink = function unlink () {
   this.model = null;
   this._unlinked = true;
 };
+
+// import filters from '../filters/index';
 
 function link(config) {
   config = extend({ el: window.document, model: {}, methods: null, routes: null }, config);
