@@ -9,6 +9,22 @@
   (global.link = factory());
 }(this, (function () { 'use strict';
 
+var watchRegex = /^\$?\w+(\.?\w+)*$/;
+var watchStartRegex = /[a-zA-Z$_]/;
+var validWatchChar = /[a-zA-Z0-9$\.]/;
+var push = Array.prototype.push;
+var glob = {
+  registeredTagsCount: 0,
+  registeredTags: Object.create(null)
+};
+var testInterpolationRegex = /\{\{[^\}]+\}\}/;
+var interpilationExprRegex = /\{\{([^\}]+)\}\}/g;
+var spaceRegex = /\s+/;
+var eventPrefix = '@';
+var interceptArrayMethods = ['push', 'pop', 'unshift', 'shift', 'reverse', 'sort', 'splice'];
+var filters = Object.create(null);
+var newFunCacheKey='NEWFUNCACHE';
+
 function isObject(obj) {
   return !!obj && typeof obj === 'object';
 }
@@ -109,40 +125,19 @@ function copy(src) {
     return src;
   }
 }
-var nextTick = window.requestAnimationFrame || window.setTimeout;
-var cancelNextTick = window.cancelAnimationFrame || window.clearTimeout;
 function debounce(fn) {
   var timer = 0;
   return function debounceFn() {
-    if (timer) { cancelNextTick(timer); }
-    timer = nextTick(fn);
+    if (timer) { clearTimeout(timer); }
+    timer = setTimeout(fn);
   }
 }
-function getCacheFn(cache, key, gen) {
-  return cache[key] || (cache[key] = gen());
+function getCacheFn(model, key, gen) {
+  return model[newFunCacheKey][key] || (model[newFunCacheKey][key] = gen());
 }
 
-var watchRegex = /^\$?\w+(\.?\w+)*$/;
-
-var watchStartRegex = /[a-zA-Z$_]/;
-var validWatchChar = /[a-zA-Z0-9$\.]/;
-
-
-
-var push = Array.prototype.push;
-var glob = {
-  registeredTagsCount: 0,
-  registeredTags: Object.create(null)
-};
-var testInterpolationRegex = /\{\{[^\}]+\}\}/;
-var interpilationExprRegex = /\{\{([^\}]+)\}\}/g;
-var spaceRegex = /\s+/;
-var eventPrefix = '@';
-var interceptArrayMethods = ['push', 'pop', 'unshift', 'shift', 'reverse', 'sort', 'splice'];
-var filters = Object.create(null);
-
 function $eval(expr, model) {
-  return getCacheFn(model._newFnCache, expr, function () {
+  return getCacheFn(model, expr, function () {
     return new Function('m', ("with(m){return " + expr + ";}"));
   })(model);
 }
@@ -174,7 +169,7 @@ function execFilterExpr(expr, model) {
   return filterFn($eval(ar[0], model));
 }
 function setWatchValue(watch, value, model) {
-  return getCacheFn(model._newFnCache, 'set' + watch, function () {
+  return getCacheFn(model, 'set' + watch, function () {
     return new Function('m', 'v', ("with(m){" + watch + "=v;}"))
   })(model, value);
 }
@@ -572,14 +567,14 @@ LinkContext.create = function create (el, watch, directive, expr, linker) {
 };
 LinkContext.prototype.setWatch = function setWatch (v) {
   var $this = this;
-  var setter = getCacheFn(this.model._newFnCache, this.watchSetterFnKey, function () {
+  var setter = getCacheFn(this.model, this.watchSetterFnKey, function () {
     return new Function('m', 'v', ("with(m){ " + ($this.prop) + "=v;}"));
   });
   setter(this.model, v);
 };
 prototypeAccessors.exprVal.get = function () {
   var $this = this;
-  var getter = getCacheFn(this.model._newFnCache, this.expr, function () {
+  var getter = getCacheFn(this.model, this.expr, function () {
     return new Function('m', ("with(m){return " + ($this.expr) + ";}"))
   });
   return getter(this.model);
@@ -781,7 +776,7 @@ function compile(linker, el) {
   }
 }
 function genEventFn(expr, model) {
-  var fn = getCacheFn(model._newFnCache, expr, function () {
+  var fn = getCacheFn(model, expr, function () {
     return new Function('m', '$event', ("with(m){" + expr + "}"));
   });
   return function (ev) {
@@ -814,7 +809,6 @@ var Link = function Link(el, data, behaviors, routeConfig) {
   this._comCollection = [];
   this._unlinked = false;
   this._children = null;
-  this._context = null;
   this._bootstrap();
   if (routeConfig) {
     this._routeTplStore = Object.create(null);
@@ -827,9 +821,9 @@ var Link = function Link(el, data, behaviors, routeConfig) {
 };
 Link.prototype._bootstrap = function _bootstrap () {
   var $this = this;
-  if(!this.model._newFnCache){
-    Object.defineProperty(this.model,'_newFnCache',{
-      value:Object.create(null)
+  if (!this.model[newFunCacheKey]) {
+    Object.defineProperty(this.model, newFunCacheKey, {
+      value: Object.create(null), enumerable: false, configurable: false, writable: true
     });
   }
   this._compileDOM();
@@ -879,7 +873,7 @@ Link.prototype._defineObserver = function _defineObserver (model, prop, value, w
           $this._notify(watch, value);
         }
         if ($this.$parent) {
-          $this.$parent._notify($this.$watch,value,{op:'mutate'});
+          $this.$parent._notify($this.$watch, value, { op: 'mutate' });
         }
         if ($this._children) {
           each($this._children, function (linker) {
@@ -916,25 +910,24 @@ Link.prototype._renderComponent = function _renderComponent () {
 };
 Link.prototype.watch = function watch (watch, handler, immediate) {
   if (isString(watch) && watch.trim() !== '' && isFunction(handler)) {
-    var userMap = this._watchFnMap[watch];
-    if (!userMap) {
-      userMap = this._watchFnMap[watch] = [];
-    }
-    userMap.push(!immediate ? debounce(handler) : handler);
+    var fnMap = this._watchFnMap[watch] || (this._watchFnMap[watch] = []);
+    fnMap.push(!immediate ? debounce(handler) : handler);
   }
 };
 Link.prototype._notify = function _notify (watch, newVal, arrayOpInfo) {
-  var linkContexts = this._watchMap[watch];
-  if (linkContexts) {
-    each(linkContexts, function (lc) {
-      lc.update(newVal, arrayOpInfo);
-    });
-  }
-  var fns = this._watchFnMap[watch];
-  if (fns) {
-    each(fns, function (fn) {
-      fn();
-    });
+  if (!this._unlinked) {
+    var linkContexts = this._watchMap[watch];
+    if (linkContexts) {
+      each(linkContexts, function (lc) {
+        lc.update(newVal, arrayOpInfo);
+      });
+    }
+    var fns = this._watchFnMap[watch];
+    if (fns) {
+      each(fns, function (fn) {
+        fn();
+      });
+    }
   }
 };
 Link.prototype._compileDOM = function _compileDOM () {
@@ -942,43 +935,41 @@ Link.prototype._compileDOM = function _compileDOM () {
 };
 Link.prototype.unlink = function unlink () {
     var this$1 = this;
-  this._behaviors = null;
-  this._watchMap = null;
-  this._watchFnMap = null;
-  this._routeEl = null;
-  this._comCollection.length = 0;
-  this._routeTplStore = null;
-  this._comTplStore = null;
-  each(this._eventStore, function (event) {
-    removeEventListenerHandler(event.el, event.event, event.handler);
-  });
-  this._eventStore.length = 0;
-  if (this._children) {
-    each(this._children, function (linker) {
-      if (!linker._unlinked) {
-        linker.unlink();
-      }
+  if (!this._unlinked) {
+    this._unlinked = true;
+    this._behaviors = null;
+    this._watchMap = null;
+    this._watchFnMap = null;
+    this._routeEl = null;
+    this._comCollection.length = 0;
+    this._routeTplStore = null;
+    this._comTplStore = null;
+    each(this._eventStore, function (event) {
+      removeEventListenerHandler(event.el, event.event, event.handler);
     });
-    this._children.length = 0;
-  }
-  if (this.$parent) {
-    var children = this.$parent._children,
-      len = children.length,
-      i = -1;
-    while (++i < len) {
-      if (children[i] === this$1) {
-        children.splice(i, 1);
-        break;
-      }
+    this._eventStore.length = 0;
+    if (this._children) {
+      each(this._children, function (linker) {
+        linker.unlink();
+      });
+      this._children.length = 0;
     }
-    this.$parent = null;
-    this.el.parentNode.removeChild(this.el);
-    this.el = null;
-  }else{
-    this._evFnCache=null;
+    if (this.$parent) {
+      var children = this.$parent._children,
+        len = children.length,
+        i = -1;
+      while (++i < len) {
+        if (children[i] === this$1) {
+          children.splice(i, 1);
+          break;
+        }
+      }
+      this.$parent = null;
+      this.el.parentNode.removeChild(this.el);
+      this.el = null;
+    }
+    this.model = null;
   }
-  this.model = null;
-  this._unlinked = true;
 };
 
 function link(config) {
